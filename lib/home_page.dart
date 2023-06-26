@@ -3,6 +3,124 @@ import 'package:sensors_plus/sensors_plus.dart';
 import 'profile_page.dart';
 import 'goals_page.dart';
 
+class stepGoal {
+  final String title;
+  final int targetSteps;
+  int currentSteps;
+
+  stepGoal({required this.title, required this.targetSteps, required this.currentSteps});
+}
+
+class GoalWidget extends StatelessWidget {
+  final stepGoal goal;
+
+  GoalWidget({required this.goal});
+
+  @override
+  Widget build(BuildContext context) {
+    double progress = goal.currentSteps / goal.targetSteps;
+    String title = goal.title;
+    int current = goal.currentSteps;
+    int target = goal.targetSteps;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20.0),
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width * 0.75, // 75% of screen width
+        child: Center(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: MediaQuery.of(context).size.width * 0.75,
+                height: 45,
+                decoration: BoxDecoration(
+                  color: Colors.green[700], // Dark green background color
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(10),
+                    topRight: Radius.circular(10),
+                  ), // Rounded edges only at the top
+                ),
+                alignment: Alignment.center, // Center the text within the container
+                padding: const EdgeInsets.all(10.0), // Optional padding
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    decoration: TextDecoration.none,
+                  ),
+                ),
+              ),
+              Container(
+                width: MediaQuery.of(context).size.width * 0.75,
+                decoration: const BoxDecoration(
+                  color: Colors.white, // White background color
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(10),
+                    bottomRight: Radius.circular(10),
+                  ), // Rounded edges only at the bottom
+                ),
+                padding: const EdgeInsets.all(10.0), // Optional padding
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Center the text within the row
+                  children: [
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        CircularProgressIndicator(
+                          value: progress,
+                          strokeWidth: 3,
+                          color: Colors.green,
+                        ),
+                        Text(
+                          '${(progress * 100).toStringAsFixed(1)}%',
+                          style: const TextStyle(
+                            color: Colors.green,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            decoration: TextDecoration.none,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Text(
+                      '$current / $target',
+                      style: TextStyle(
+                        color: Colors.green,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        decoration: TextDecoration.none,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        )
+
+      ),
+    );
+  }
+}
+
+List<stepGoal> goals = [
+  stepGoal(title: 'Goal 1', targetSteps: 10000, currentSteps: 7500),
+  stepGoal(title: 'Goal 2', targetSteps: 5000, currentSteps: 3500),
+  stepGoal(title: 'Goal 3', targetSteps: 8000, currentSteps: 4000),
+  stepGoal(title: 'Goal 4', targetSteps: 8000, currentSteps: 4000),
+  stepGoal(title: 'Goal 5', targetSteps: 8000, currentSteps: 4000),
+];
+
+class homepage extends StatefulWidget {
+  const homepage({Key? key, required this.title}) : super(key: key);
+  final String title;
+  @override
+  _homepageState createState() => _homepageState();
+}
+
 class _homepageState extends State<homepage> {
   int stepCount = 0;
   bool isPeak = false;
@@ -29,6 +147,9 @@ class _homepageState extends State<homepage> {
           setState(() {
             stepCount++;
             print(stepCount);
+            goals.forEach((goal) {
+              goal.currentSteps += 1;
+            });
           });
         }
       }
@@ -75,7 +196,7 @@ class _homepageState extends State<homepage> {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: Colors.blue,
                             decoration: TextDecoration.none,
                           ),
                         ),
@@ -150,139 +271,15 @@ class _homepageState extends State<homepage> {
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 20.0),
+            Expanded(
               child: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.75, // 75% of screen width
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: double.infinity,
-                      height: 45,
-                      decoration: BoxDecoration(
-                        color: Colors.green[700], // Dark green background color
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(10),
-                          topRight: Radius.circular(10),
-                        ), // Rounded edges only at the top
-                      ),
-                      alignment: Alignment.center, // Center the text within the container
-                      padding: const EdgeInsets.all(10.0), // Optional padding
-                      child: const Text(
-                        'How fast con I hit 2K',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          decoration: TextDecoration.none,
-                        ),
-                      ),
-                    ),
-                    Container(
-                      width: double.infinity,
-                      height: 45,
-                      decoration: const BoxDecoration(
-                        color: Colors.white, // White background color
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(10),
-                          bottomRight: Radius.circular(10),
-                        ), // Rounded edges only at the bottom
-                      ),
-                      padding: const EdgeInsets.all(10.0), // Optional padding
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center, // Center the text within the row
-                        children: const [
-                          Text(
-                            'img of progression',
-                            style: TextStyle(
-                              color: Colors.green,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.none,
-                            ),
-                          ),
-                          Text(
-                            '1400/2000',
-                            style: TextStyle(
-                              color: Colors.green,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.none,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 20.0),
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.75, // 75% of screen width
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: double.infinity,
-                      height: 45,
-                      decoration: BoxDecoration(
-                        color: Colors.green[700], // Dark green background color
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(10),
-                          topRight: Radius.circular(10),
-                        ), // Rounded edges only at the top
-                      ),
-                      alignment: Alignment.center, // Center the text within the container
-                      padding: const EdgeInsets.all(10.0), // Optional padding
-                      child: const Text(
-                        'Weekly',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          decoration: TextDecoration.none,
-                        ),
-                      ),
-                    ),
-                    Container(
-                      width: double.infinity,
-                      height: 45,
-                      decoration: const BoxDecoration(
-                        color: Colors.white, // White background color
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(10),
-                          bottomRight: Radius.circular(10),
-                        ), // Rounded edges only at the bottom
-                      ),
-                      padding: const EdgeInsets.all(10.0), // Optional padding
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center, // Center the text within the row
-                        children: const [
-                          Text(
-                            'img of progression',
-                            style: TextStyle(
-                              color: Colors.green,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.none,
-                            ),
-                          ),
-                          Text(
-                            '4500 / 40000',
-                            style: TextStyle(
-                              color: Colors.green,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.none,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                height: MediaQuery.of(context).size.height,
+                child: ListView.builder(
+                  itemCount: goals.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    stepGoal goal = goals[index];
+                    return GoalWidget(goal: goal);
+                  },
                 ),
               ),
             ),
@@ -293,9 +290,3 @@ class _homepageState extends State<homepage> {
   }
 }
 
-class homepage extends StatefulWidget {
-  const homepage({Key? key, required this.title}) : super(key: key);
-  final String title;
-  @override
-  _homepageState createState() => _homepageState();
-}
