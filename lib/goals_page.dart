@@ -8,7 +8,13 @@ class Goalspage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.lightGreen,
+      decoration: const BoxDecoration(
+        color: Colors.lightGreen,
+        image: DecorationImage(
+          image: AssetImage('assets/images/Background.png'),
+          fit: BoxFit.cover,
+        ),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -92,9 +98,9 @@ class Goalspage extends StatelessWidget {
                         ),
                       ),
                       padding: const EdgeInsets.all(10.0),
-                      child: const Column(
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
+                        children: const [
                           Material(
                             child: TextField(
                               decoration: InputDecoration(
@@ -165,9 +171,9 @@ class Goalspage extends StatelessWidget {
                         ),
                       ),
                       padding: const EdgeInsets.all(10.0),
-                      child: const Column(
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
+                        children: const [
                           Material(
                             child: TextField(
                               decoration: InputDecoration(

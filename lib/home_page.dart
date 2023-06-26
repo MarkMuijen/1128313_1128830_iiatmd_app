@@ -8,7 +8,13 @@ class homepage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.lightGreen,
+      decoration: const BoxDecoration(
+        color: Colors.lightGreen,
+        image: DecorationImage(
+          image: AssetImage('assets/images/Background.png'),
+          fit: BoxFit.cover,
+        ),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -146,9 +152,9 @@ class homepage extends StatelessWidget {
                         ), // Rounded edges only at the bottom
                       ),
                       padding: const EdgeInsets.all(10.0), // Optional padding
-                      child: const Row(
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.center, // Center the text within the row
-                        children: [
+                        children: const [
                           Text(
                             'img of progression',
                             style: TextStyle(
@@ -214,9 +220,9 @@ class homepage extends StatelessWidget {
                         ), // Rounded edges only at the bottom
                       ),
                       padding: const EdgeInsets.all(10.0), // Optional padding
-                      child: const Row(
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.center, // Center the text within the row
-                        children: [
+                        children: const [
                           Text(
                             'img of progression',
                             style: TextStyle(
