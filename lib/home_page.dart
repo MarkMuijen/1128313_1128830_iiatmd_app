@@ -1,10 +1,48 @@
 import 'package:flutter/material.dart';
+import 'package:sensors_plus/sensors_plus.dart';
 import 'profile_page.dart';
 import 'goals_page.dart';
 
-class homepage extends StatelessWidget {
-  const homepage({Key? key, required this.title}) : super(key: key);
-  final String title;
+class _homepageState extends State<homepage> {
+  int stepCount = 0;
+  bool isPeak = false;
+  double threshold = 1.0;
+  double previousY = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    startStepCounting();
+  }
+
+
+  void startStepCounting() {
+    accelerometerEvents.listen((AccelerometerEvent event) {
+      double currentY = event.y;
+      double deltaY = currentY - previousY;
+
+      if (deltaY > 0 && !isPeak) {
+        isPeak = true;
+      } else if (deltaY < 0 && isPeak) {
+        isPeak = false;
+        if (deltaY.abs() > threshold) {
+          setState(() {
+            stepCount++;
+            print(stepCount);
+          });
+        }
+      }
+
+      previousY = currentY;
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    accelerometerEvents.drain();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -31,7 +69,7 @@ class homepage extends StatelessWidget {
                         ),
                         const SizedBox(
                             width:
-                                8), // Adding some spacing between the image and text
+                            8), // Adding some spacing between the image and text
                         const Text(
                           'Stapp',
                           style: TextStyle(
@@ -48,8 +86,8 @@ class homepage extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(context,
                           MaterialPageRoute(builder: (context) {
-                        return const ProfilePage(title: 'Profilepage');
-                      }));
+                            return const ProfilePage(title: 'Profilepage');
+                          }));
                     },
                     child: const Text('profile >'),
                   ),
@@ -75,11 +113,11 @@ class homepage extends StatelessWidget {
                       color: Colors.blue,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Center(
+                    child: Center(
                       child: Text(
-                        '4500',
+                        '$stepCount',
                         style: TextStyle(
-                            fontSize: 24, color: Colors.white, fontWeight: FontWeight.bold, decoration: TextDecoration.none,),
+                          fontSize: 24, color: Colors.white, fontWeight: FontWeight.bold, decoration: TextDecoration.none,),
 
                       ),
                     ),
@@ -253,4 +291,11 @@ class homepage extends StatelessWidget {
       ),
     );
   }
+}
+
+class homepage extends StatefulWidget {
+  const homepage({Key? key, required this.title}) : super(key: key);
+  final String title;
+  @override
+  _homepageState createState() => _homepageState();
 }
