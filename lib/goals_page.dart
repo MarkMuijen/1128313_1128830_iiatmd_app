@@ -1,9 +1,25 @@
 import 'package:flutter/material.dart';
 import 'home_page.dart';
+import 'dart:convert';
+import 'dart:io';
 
-class Goalspage extends StatelessWidget {
+void saveToJson(Map<String, dynamic> data) {
+  final jsonString = jsonEncode(data);
+  final file = File('user_goals.json');
+  file.writeAsString(jsonString);
+}
+
+class Goalspage extends StatefulWidget {
   const Goalspage({Key? key, required this.title}) : super(key: key);
   final String title;
+
+  @override
+  _GoalspageState createState() => _GoalspageState();
+}
+
+class _GoalspageState extends State<Goalspage> {
+  String name = '';
+  double amount = 0.0;
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +95,7 @@ class Goalspage extends StatelessWidget {
                       alignment: Alignment.center, // Center the text within the container
                       padding: const EdgeInsets.all(10.0), // Optional padding
                       child: const Text(
-                        'Daily',
+                        'New Goal',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 16,
@@ -100,10 +116,10 @@ class Goalspage extends StatelessWidget {
                       padding: const EdgeInsets.all(10.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
+                        children: [
                           Material(
                             child: TextField(
-                              decoration: InputDecoration(
+                              decoration: const InputDecoration(
                                 labelText: 'Name',
                                 labelStyle: TextStyle(
                                   color: Colors.green,
@@ -111,11 +127,16 @@ class Goalspage extends StatelessWidget {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
+                              onChanged: (value) {
+                                setState(() {
+                                  name = value;
+                                });
+                              },
                             ),
                           ),
                           Material(
                             child: TextField(
-                              decoration: InputDecoration(
+                              decoration: const InputDecoration(
                                 labelText: 'Amount',
                                 labelStyle: TextStyle(
                                   color: Colors.green,
@@ -123,80 +144,22 @@ class Goalspage extends StatelessWidget {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
+                              onChanged: (value) {
+                                setState(() {
+                                  amount = double.tryParse(value) ?? 0.0;
+                                });
+                              },
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 20.0),
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.75, // 75% of screen width
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: double.infinity,
-                      height: 45,
-                      decoration: BoxDecoration(
-                        color: Colors.green[700], // Dark green background color
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(10),
-                          topRight: Radius.circular(10),
-                        ), // Rounded edges only at the top
-                      ),
-                      alignment: Alignment.center, // Center the text within the container
-                      padding: const EdgeInsets.all(10.0), // Optional padding
-                      child: const Text(
-                        'Weekly',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          decoration: TextDecoration.none,
-                        ),
-                      ),
-                    ),
-                    Container(
-                      width: double.infinity,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(10),
-                          bottomRight: Radius.circular(10),
-                        ),
-                      ),
-                      padding: const EdgeInsets.all(10.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Material(
-                            child: TextField(
-                              decoration: InputDecoration(
-                                labelText: 'Name',
-                                labelStyle: TextStyle(
-                                  color: Colors.green,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                          Material(
-                            child: TextField(
-                              decoration: InputDecoration(
-                                labelText: 'Amount',
-                                labelStyle: TextStyle(
-                                  color: Colors.green,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
+                          ElevatedButton(
+                            onPressed: () {
+                              final userInput = {
+                                'name': name,
+                                'amount': amount,
+                              };
+                              saveToJson(userInput);
+                            },
+                            child: const Text('Save'),
                           ),
                         ],
                       ),
