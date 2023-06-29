@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:sensors_plus/sensors_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'profile_page.dart';
 import 'goals_page.dart';
 
@@ -9,6 +12,41 @@ class stepGoal {
   int currentSteps;
 
   stepGoal({required this.title, required this.targetSteps, required this.currentSteps});
+}
+
+void saveGoals(List<stepGoal> goals) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  List<Map<String, dynamic>> goalList = goals
+      .map((goal) => {'title': goal.title, 'targetSteps': goal.targetSteps, 'currentSteps': goal.currentSteps})
+      .toList();
+
+  await prefs.setStringList('goalList', goalList.map((goal) => jsonEncode(goal)).toList().cast<String>());
+}
+
+Future<List<stepGoal>> getGoals() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  List<String>? goalList = prefs.getStringList('goalList');
+
+  if (goalList != null) {
+    return goalList.map((goal) {
+      Map<String, dynamic> json = jsonDecode(goal);
+      return stepGoal(title: json['title'], targetSteps: json['targetSteps'], currentSteps: json['currentSteps']);
+    }).toList();
+  }
+
+  return [];
+}
+
+void saveSteps(steps) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setInt('stepcount', steps);
+}
+
+Future<int> getSteps() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.getInt('stepcount') ?? 0;
 }
 
 class GoalWidget extends StatelessWidget {
@@ -106,13 +144,6 @@ class GoalWidget extends StatelessWidget {
   }
 }
 
-List<stepGoal> goals = [
-  stepGoal(title: 'Goal 1', targetSteps: 10000, currentSteps: 7500),
-  stepGoal(title: 'Goal 2', targetSteps: 5000, currentSteps: 3500),
-  stepGoal(title: 'Goal 3', targetSteps: 8000, currentSteps: 4000),
-  stepGoal(title: 'Goal 4', targetSteps: 8000, currentSteps: 4000),
-  stepGoal(title: 'Goal 5', targetSteps: 8000, currentSteps: 4000),
-];
 
 class homepage extends StatefulWidget {
   const homepage({Key? key, required this.title}) : super(key: key);
@@ -126,6 +157,13 @@ class _homepageState extends State<homepage> {
   bool isPeak = false;
   double threshold = 1.0;
   double previousY = 0.0;
+  List<stepGoal> goals = [
+    stepGoal(title: 'Goal 1', targetSteps: 10000, currentSteps: 7500),
+    stepGoal(title: 'Goal 2', targetSteps: 5000, currentSteps: 3500),
+    stepGoal(title: 'Goal 3', targetSteps: 8000, currentSteps: 4000),
+    stepGoal(title: 'Goal 4', targetSteps: 8000, currentSteps: 4000),
+    stepGoal(title: 'Goal 5', targetSteps: 8000, currentSteps: 4000),
+  ];
 
   @override
   void initState() {
@@ -134,7 +172,14 @@ class _homepageState extends State<homepage> {
   }
 
 
-  void startStepCounting() {
+  void startStepCounting() async {
+    List<stepGoal> awaitedGoals = await getGoals();
+    int awaitedSteps = await getSteps();
+
+    setState(() {
+      stepCount = awaitedSteps;
+      goals = awaitedGoals;
+    });
     accelerometerEvents.listen((AccelerometerEvent event) {
       double currentY = event.y;
       double deltaY = currentY - previousY;
@@ -151,6 +196,8 @@ class _homepageState extends State<homepage> {
               goal.currentSteps += 1;
             });
           });
+          saveGoals(goals);
+          saveSteps(stepCount);
         }
       }
 
