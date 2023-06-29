@@ -39,6 +39,14 @@ Future<List<stepGoal>> getGoals() async {
   return [];
 }
 
+void addGoal(stepGoal newGoal) async {
+  List<stepGoal> goals = await getGoals();
+
+  goals.add(newGoal);
+
+  saveGoals(goals);
+}
+
 void saveSteps(steps) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   await prefs.setInt('stepcount', steps);
@@ -158,11 +166,7 @@ class _homepageState extends State<homepage> {
   double threshold = 1.0;
   double previousY = 0.0;
   List<stepGoal> goals = [
-    stepGoal(title: 'Goal 1', targetSteps: 10000, currentSteps: 7500),
-    stepGoal(title: 'Goal 2', targetSteps: 5000, currentSteps: 3500),
-    stepGoal(title: 'Goal 3', targetSteps: 8000, currentSteps: 4000),
-    stepGoal(title: 'Goal 4', targetSteps: 8000, currentSteps: 4000),
-    stepGoal(title: 'Goal 5', targetSteps: 8000, currentSteps: 4000),
+    stepGoal(title: 'testGoal', targetSteps: 10000, currentSteps: 7500),
   ];
 
   @override
