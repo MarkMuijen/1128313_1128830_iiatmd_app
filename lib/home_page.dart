@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'profile_page.dart';
 import 'goals_page.dart';
 
 class stepGoal {
@@ -57,83 +56,130 @@ Future<int> getSteps() async {
   return prefs.getInt('stepcount') ?? 0;
 }
 
-class GoalWidget extends StatelessWidget {
+class GoalWidget extends StatefulWidget {
   final stepGoal goal;
+  final VoidCallback? onRemove;
 
-  GoalWidget({required this.goal});
+  GoalWidget({required this.goal, this.onRemove});
 
   @override
+  _GoalWidgetState createState() => _GoalWidgetState();
+}
+
+class _GoalWidgetState extends State<GoalWidget> {
+  @override
   Widget build(BuildContext context) {
-    double progress = goal.currentSteps / goal.targetSteps;
-    String title = goal.title;
-    int current = goal.currentSteps;
-    int target = goal.targetSteps;
+    double progress = widget.goal.currentSteps / widget.goal.targetSteps;
+    String title = widget.goal.title;
+    int current = widget.goal.currentSteps;
+    int target = widget.goal.targetSteps;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 20.0),
       child: SizedBox(
         width: MediaQuery.of(context).size.width * 0.75, // 75% of screen width
-        child: Center(
+        child: Material(
+          elevation: 2,
+          borderRadius: BorderRadius.circular(10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: MediaQuery.of(context).size.width * 0.75,
+                width: double.infinity, // Set width to fill the available space
                 height: 45,
                 decoration: BoxDecoration(
-                  color: Colors.green[700], // Dark green background color
+                  color: Colors.green[700],
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(10),
                     topRight: Radius.circular(10),
-                  ), // Rounded edges only at the top
-                ),
-                alignment: Alignment.center, // Center the text within the container
-                padding: const EdgeInsets.all(10.0), // Optional padding
-                child: Text(
-                  title,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    decoration: TextDecoration.none,
                   ),
+                ),
+                padding: const EdgeInsets.all(10.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          decoration: TextDecoration.none,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      color: Colors.white,
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Confirm Removal'),
+                              content: Text('Are you sure you want to remove the goals?'),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: Text('Cancel'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop(); // Close the dialog
+                                  },
+                                ),
+                                TextButton(
+                                  child: Text('Remove'),
+                                  onPressed: () {
+                                    widget.onRemove?.call(); // Call the callback
+                                    Navigator.of(context).pop(); // Close the dialog
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ),
               Container(
                 width: MediaQuery.of(context).size.width * 0.75,
                 decoration: const BoxDecoration(
-                  color: Colors.white, // White background color
+                  color: Colors.white,
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(10),
                     bottomRight: Radius.circular(10),
-                  ), // Rounded edges only at the bottom
+                  ),
                 ),
-                padding: const EdgeInsets.all(10.0), // Optional padding
+                padding: const EdgeInsets.all(10.0),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Center the text within the row
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        CircularProgressIndicator(
-                          value: progress,
-                          strokeWidth: 3,
-                          color: Colors.green,
-                        ),
-                        Text(
-                          '${(progress * 100).toStringAsFixed(1)}%',
-                          style: const TextStyle(
+                    Flexible(
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          CircularProgressIndicator(
+                            value: progress,
+                            strokeWidth: 3,
                             color: Colors.green,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            decoration: TextDecoration.none,
                           ),
-                        ),
-                      ],
+                          Text(
+                            '${(progress * 100).toStringAsFixed(1)}%',
+                            style: const TextStyle(
+                              color: Colors.green,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.none,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     Text(
                       '$current / $target',
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.green,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -145,13 +191,11 @@ class GoalWidget extends StatelessWidget {
               ),
             ],
           ),
-        )
-
+        ),
       ),
     );
   }
 }
-
 
 class homepage extends StatefulWidget {
   const homepage({Key? key, required this.title}) : super(key: key);
@@ -254,15 +298,6 @@ class _homepageState extends State<homepage> {
                       ],
                     ),
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) {
-                            return const ProfilePage(title: 'Profilepage');
-                          }));
-                    },
-                    child: const Text('profile >'),
-                  ),
                 ],
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
               ),
@@ -288,7 +323,7 @@ class _homepageState extends State<homepage> {
                     child: Center(
                       child: Text(
                         '$stepCount',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 24, color: Colors.white, fontWeight: FontWeight.bold, decoration: TextDecoration.none,),
 
                       ),
@@ -329,7 +364,15 @@ class _homepageState extends State<homepage> {
                   itemCount: goals.length,
                   itemBuilder: (BuildContext context, int index) {
                     stepGoal goal = goals[index];
-                    return GoalWidget(goal: goal);
+                    return GoalWidget(
+                      goal: goal,
+                      onRemove: () {
+                        setState(() {
+                          goals.removeAt(index);
+                          saveGoals(goals);
+                        });
+                      },
+                    );
                   },
                 ),
               ),

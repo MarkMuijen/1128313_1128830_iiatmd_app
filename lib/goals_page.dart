@@ -176,11 +176,54 @@ class _GoalspageState extends State<Goalspage> {
                           ),
                           ElevatedButton(
                             onPressed: () {
-                              stepGoal inputGoal = stepGoal(title: inputTitle, targetSteps: inputTargetSteps, currentSteps: inputCurrentSteps);
-                              addGoal(inputGoal);
+                              if (inputTitle != null && inputTitle.isNotEmpty &&
+                                  inputTargetSteps != null && inputTargetSteps.toString().isNotEmpty) {
+                                stepGoal inputGoal = stepGoal(
+                                  title: inputTitle,
+                                  targetSteps: inputTargetSteps,
+                                  currentSteps: inputCurrentSteps,
+                                );
+                                addGoal(inputGoal);
+
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: const Text('Goal Added'),
+                                      content: const Text('The goal has been added to your goals.'),
+                                      actions: <Widget>[
+                                        TextButton(
+                                          child: const Text('OK'),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              } else {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: const Text('Error'),
+                                      content: const Text('Please fill in both the title and target steps.'),
+                                      actions: <Widget>[
+                                        TextButton(
+                                          child: const Text('OK'),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              }
                             },
                             child: const Text('Add'),
-                          ),
+                          )
                         ],
                       ),
                     ),
